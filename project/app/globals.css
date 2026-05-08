@@ -1,0 +1,865 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #010105;
+    color: #ffffff;
+    cursor: crosshair;
+  }
+}
+
+/* --- CYBERPUNK HUD EFFECTS --- */
+.scanlines {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.15;
+}
+
+.noise-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.glass-panel {
+  background: rgba(10, 10, 16, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.holographic-text {
+  background: linear-gradient(to right, #7C3AED, #06B6D4, #10B981, #7C3AED);
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+}
+
+.neon-border-pulse {
+  animation: borderPulse 2s infinite alternate;
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+@keyframes borderPulse {
+  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); border-color: rgba(6, 182, 212, 0.5); }
+  100% { box-shadow: 0 0 20px 2px rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.2); }
+}
+
+/* Models page skeleton shimmer */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.06) 40px, rgba(255,255,255,0.02) 80px);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+/* Custom scrollbar for filter sidebar */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(6,182,212,0.5); }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 200 86% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 10%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 12%;
+    --muted-foreground: 240 5% 55%;
+    --accent: 200 86% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 12%;
+    --input: 240 3.7% 12%;
+    --ring: 200 86% 65%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-[#09090B] text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background glow */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(90, 200, 250, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 110%, rgba(52, 199, 89, 0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255, 149, 0, 0.03) 0%, transparent 70%);
+    animation: ambient-shift 18s ease-in-out infinite alternate;
+  }
+
+  @keyframes ambient-shift {
+    0%   { opacity: 0.7; filter: hue-rotate(0deg); }
+    33%  { opacity: 1;   filter: hue-rotate(20deg); }
+    66%  { opacity: 0.8; filter: hue-rotate(-10deg); }
+    100% { opacity: 0.7; filter: hue-rotate(5deg); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(90, 200, 250, 0.3); }
+
+  /* Selection */
+  ::selection { background: rgba(90, 200, 250, 0.2); color: white; }
+}
+
+@layer utilities {
+  /* ─── Glass morphism ─── */
+  .glass {
+    @apply backdrop-blur-2xl bg-white/[0.04] border border-white/[0.08];
+  }
+  .glass-sm {
+    @apply backdrop-blur-xl bg-white/[0.03] border border-white/[0.06];
+  }
+  .glass-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+  }
+  .glass-hover {
+    @apply hover:bg-white/[0.06] transition-colors duration-200;
+  }
+
+  /* ─── Panel layers ─── */
+  .panel-0 { background: #09090B; }
+  .panel-1 { background: #0D0D10; }
+  .panel-2 { background: #111114; }
+  .panel-3 { background: #161619; }
+  .panel-4 { background: #1C1C20; }
+
+  /* ─── Gradient texts ─── */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #5AC8FA 0%, #A9D171 45%, #FF9500 100%);
+  }
+  .gradient-text-warm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #FF9500 0%, #FF3B30 100%);
+  }
+  .gradient-text-cool {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #5AC8FA 0%, #34C759 100%);
+  }
+
+  /* ─── Neon glows (legacy compat) ─── */
+  .neon-text-cyan   { text-shadow: 0 0 20px rgba(90, 200, 250, 0.8), 0 0 40px rgba(90, 200, 250, 0.4); }
+  .neon-text-green  { text-shadow: 0 0 20px rgba(52, 199, 89, 0.8), 0 0 40px rgba(52, 199, 89, 0.4); }
+  .neon-text-amber  { text-shadow: 0 0 20px rgba(255, 149, 0, 0.8), 0 0 40px rgba(255, 149, 0, 0.4); }
+  .neon-text-purple { text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(168, 85, 247, 0.4); }
+  .neon-text-pink   { text-shadow: 0 0 20px rgba(236, 72, 153, 0.8), 0 0 40px rgba(236, 72, 153, 0.4); }
+
+  /* ─── Brand glows ─── */
+  .glow-blue     { text-shadow: 0 0 18px rgba(90, 200, 250, 0.7); }
+  .glow-green    { text-shadow: 0 0 18px rgba(52, 199, 89, 0.7); }
+  .glow-amber    { text-shadow: 0 0 18px rgba(255, 149, 0, 0.7); }
+  .glow-red      { text-shadow: 0 0 18px rgba(255, 59, 48, 0.7); }
+
+  /* ─── Box shadows ─── */
+  .shadow-blue      { box-shadow: 0 0 24px rgba(90, 200, 250, 0.2); }
+  .shadow-green     { box-shadow: 0 0 24px rgba(52, 199, 89, 0.2); }
+  .shadow-amber     { box-shadow: 0 0 24px rgba(255, 149, 0, 0.2); }
+  .shadow-glow-card { box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06); }
+
+  /* ─── Input glow ─── */
+  .input-glow-blue  { box-shadow: 0 0 0 2px rgba(90,200,250,0.2), 0 0 20px rgba(90,200,250,0.07); }
+  .input-glow-green { box-shadow: 0 0 0 2px rgba(52,199,89,0.2), 0 0 20px rgba(52,199,89,0.07); }
+
+  /* ─── Status dots ─── */
+  .status-online  { @apply bg-brand-green; animation: pulse-dot 2s ease-in-out infinite; }
+  .status-stream  { @apply bg-brand-blue; animation: pulse-dot 0.8s ease-in-out infinite; }
+  .status-offline { @apply bg-brand-red; }
+
+  /* ─── Skeleton shimmer ─── */
+  .skeleton {
+    background: linear-gradient(90deg, #1A1A1E 0px, #24242A 40px, #1A1A1E 80px);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* ─── Progress bar ─── */
+  .progress-bar-blue {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #5AC8FA, transparent);
+    animation: shimmer 1.2s infinite linear;
+  }
+
+  /* ─── OR-style table row ─── */
+  .model-row {
+    @apply flex items-center gap-3 px-4 py-3 border-b border-white/[0.05] hover:bg-white/[0.025] transition-colors cursor-pointer;
+  }
+
+  /* ─── Badge variants ─── */
+  .badge-free {
+    @apply px-2 py-0.5 text-[10px] rounded-full text-brand-green font-medium;
+    background: rgba(52, 199, 89, 0.12);
+    border: 1px solid rgba(52, 199, 89, 0.25);
+  }
+  .badge-new {
+    @apply px-2 py-0.5 text-[10px] rounded-full text-brand-blue font-medium;
+    background: rgba(90, 200, 250, 0.12);
+    border: 1px solid rgba(90, 200, 250, 0.25);
+  }
+  .badge-hot {
+    @apply px-2 py-0.5 text-[10px] rounded-full text-brand-amber font-medium;
+    background: rgba(255, 149, 0, 0.12);
+    border: 1px solid rgba(255, 149, 0, 0.25);
+  }
+  .badge-code {
+    @apply px-2 py-0.5 text-[10px] rounded-full text-neon-pink font-medium;
+    background: rgba(236, 72, 153, 0.12);
+    border: 1px solid rgba(236, 72, 153, 0.25);
+  }
+
+  /* ─── Stat counter ─── */
+  .stat-value { @apply text-4xl font-black font-heading text-white tabular-nums; }
+  .stat-label { @apply text-xs text-white/40 uppercase tracking-wider mt-0.5; }
+
+  /* ─── Section divider ─── */
+  .section-divider {
+    @apply h-px w-full;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  /* ─── Card hover ─── */
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(90,200,250,0.12);
+    border-color: rgba(90,200,250,0.15);
+  }
+
+  /* ─── Provider icon ─── */
+  .provider-icon {
+    @apply w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* ─── Marquee ─── */
+  .marquee-track {
+    display: flex;
+    animation: marquee-scroll 28s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+
+  @keyframes marquee-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+}
+
+/* ─── Keyframes ─── */
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position:  1000px 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.6); opacity: 0.7; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-16px); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.3); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.25); }
+  70%       { transform: scale(1); }
+}
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes typing-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%            { transform: scale(1); opacity: 1; }
+}
+@keyframes glow-ping {
+  0%         { transform: scale(1); opacity: 0.8; }
+  75%, 100%  { transform: scale(2.2); opacity: 0; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bounce-in {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ripple-expand {
+  0%   { transform: scale(0); opacity: 0.4; }
+  100% { transform: scale(4); opacity: 0; }
+}
+@keyframes counter-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Animation #30: Morphing gradient ─── */
+@keyframes morph-gradient {
+  0%   { background-position: 0% 50%; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  50%  { background-position: 100% 50%; border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+  100% { background-position: 0% 50%; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+}
+
+/* ─── Animation #31: Neon flicker ─── */
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; }
+  20%, 24%, 55% { opacity: 0.6; text-shadow: none; }
+}
+
+/* ─── Animation #32: Orbit ─── */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+}
+
+/* ─── Animation #33: Elastic scale ─── */
+@keyframes elastic-scale {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.25); }
+  40%  { transform: scale(0.9); }
+  50%  { transform: scale(1.15); }
+  65%  { transform: scale(0.95); }
+  75%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ─── Animation #34: Glass shimmer sweep ─── */
+@keyframes glass-shimmer {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+/* ─── Animation #35: Text reveal clip ─── */
+@keyframes text-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* ─── Animation #36: 3D card flip ─── */
+@keyframes card-flip {
+  0%   { transform: perspective(600px) rotateY(0deg); }
+  100% { transform: perspective(600px) rotateY(180deg); }
+}
+
+/* ─── Animation #37: Aurora borealis ─── */
+@keyframes aurora {
+  0%   { background-position: 0% 50%; filter: hue-rotate(0deg); }
+  33%  { background-position: 50% 100%; filter: hue-rotate(60deg); }
+  66%  { background-position: 100% 50%; filter: hue-rotate(120deg); }
+  100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+}
+
+/* ─── Animation #38: Matrix rain drop ─── */
+@keyframes matrix-drop {
+  0%   { transform: translateY(-100%); opacity: 1; }
+  80%  { opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* ─── Animation #39: Typewriter cursor ─── */
+@keyframes blink-cursor {
+  0%, 100% { border-color: transparent; }
+  50%      { border-color: rgba(90, 200, 250, 0.8); }
+}
+
+/* ─── Animation #40: Wave distortion ─── */
+@keyframes wave-distort {
+  0%   { transform: translateY(0) scaleX(1); }
+  25%  { transform: translateY(-3px) scaleX(1.02); }
+  50%  { transform: translateY(0) scaleX(0.98); }
+  75%  { transform: translateY(3px) scaleX(1.01); }
+  100% { transform: translateY(0) scaleX(1); }
+}
+
+/* ─── Animation #41: Magnetic pull ─── */
+@keyframes magnetic-pull {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(2px, -2px); }
+  50%      { transform: translate(-1px, 3px); }
+  75%      { transform: translate(3px, 1px); }
+}
+
+/* ─── Animation #42: Hologram scan line ─── */
+@keyframes hologram-scan {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* ─── Animation #43: Particle burst ─── */
+@keyframes particle-burst {
+  0%   { transform: scale(0) rotate(0deg); opacity: 1; }
+  50%  { opacity: 0.8; }
+  100% { transform: scale(3) rotate(180deg); opacity: 0; }
+}
+
+/* ─── Animation #44: Depth pulse ─── */
+@keyframes depth-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(90, 200, 250, 0.2); }
+  50%      { transform: scale(1.02); box-shadow: 0 0 30px 8px rgba(90, 200, 250, 0.08); }
+}
+
+/* ─── Animation #45: Color shift ─── */
+@keyframes color-shift {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* ─── Animation #46: Rubber band ─── */
+@keyframes rubber-band {
+  0%   { transform: scaleX(1); }
+  30%  { transform: scaleX(1.25) scaleY(0.75); }
+  40%  { transform: scaleX(0.75) scaleY(1.25); }
+  50%  { transform: scaleX(1.15) scaleY(0.85); }
+  65%  { transform: scaleX(0.95) scaleY(1.05); }
+  75%  { transform: scaleX(1.05) scaleY(0.95); }
+  100% { transform: scaleX(1) scaleY(1); }
+}
+
+/* ─── Animation #47: Lighthouse beam ─── */
+@keyframes lighthouse {
+  0%   { transform: rotate(0deg); opacity: 0.2; }
+  50%  { opacity: 0.6; }
+  100% { transform: rotate(360deg); opacity: 0.2; }
+}
+
+/* ─── Animation #48: DNA helix ─── */
+@keyframes dna-helix {
+  0%   { transform: rotateX(0deg) translateZ(0); }
+  50%  { transform: rotateX(180deg) translateZ(10px); }
+  100% { transform: rotateX(360deg) translateZ(0); }
+}
+
+/* ─── Animation #49: Meteor trail ─── */
+@keyframes meteor {
+  0%   { transform: translateX(100%) translateY(-100%); opacity: 1; }
+  70%  { opacity: 0.6; }
+  100% { transform: translateX(-100%) translateY(100%); opacity: 0; }
+}
+
+/* ─── Animation #50: Portal spiral ─── */
+@keyframes portal-spiral {
+  0%   { transform: rotate(0deg) scale(1); opacity: 0.5; }
+  50%  { transform: rotate(180deg) scale(0.8); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.5; }
+}
+
+/* ─── Animation #51: Quantum blur ─── */
+@keyframes quantum-blur {
+  0%, 100% { filter: blur(0px); transform: scale(1); }
+  25%      { filter: blur(1px); transform: scale(1.01); }
+  50%      { filter: blur(0px); transform: scale(0.99); }
+  75%      { filter: blur(0.5px); transform: scale(1.005); }
+}
+
+/* ─── Animation #52: Energy field ─── */
+@keyframes energy-field {
+  0%   { box-shadow: 0 0 5px rgba(90,200,250,0.1), 0 0 10px rgba(90,200,250,0.05), inset 0 0 5px rgba(90,200,250,0.05); }
+  50%  { box-shadow: 0 0 20px rgba(90,200,250,0.2), 0 0 40px rgba(90,200,250,0.1), inset 0 0 15px rgba(90,200,250,0.08); }
+  100% { box-shadow: 0 0 5px rgba(90,200,250,0.1), 0 0 10px rgba(90,200,250,0.05), inset 0 0 5px rgba(90,200,250,0.05); }
+}
+
+/* ─── Animation #53: Gravity drop ─── */
+@keyframes gravity-drop {
+  0%   { transform: translateY(-200px) scale(0.9); opacity: 0; }
+  60%  { transform: translateY(20px) scale(1.05); opacity: 1; }
+  80%  { transform: translateY(-10px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ─── Animation #54: Phantom slide ─── */
+@keyframes phantom-slide {
+  0%   { transform: translateX(20px); opacity: 0; filter: blur(4px); }
+  100% { transform: translateX(0); opacity: 1; filter: blur(0); }
+}
+
+/* ─── Animation #55: Jello wobble ─── */
+@keyframes jello-wobble {
+  0%, 11.1%, 100% { transform: translate3d(0, 0, 0); }
+  22.2% { transform: skewX(-12.5deg) skewY(-12.5deg); }
+  33.3% { transform: skewX(6.25deg) skewY(6.25deg); }
+  44.4% { transform: skewX(-3.125deg) skewY(-3.125deg); }
+  55.5% { transform: skewX(1.5625deg) skewY(1.5625deg); }
+  66.6% { transform: skewX(-0.78125deg) skewY(-0.78125deg); }
+  77.7% { transform: skewX(0.390625deg) skewY(0.390625deg); }
+  88.8% { transform: skewX(-0.1953125deg) skewY(-0.1953125deg); }
+}
+
+/* ─── Animation #56: Warp speed ─── */
+@keyframes warp-speed {
+  0%   { transform: translateZ(-1000px) scale(0.1); opacity: 0; }
+  100% { transform: translateZ(0) scale(1); opacity: 1; }
+}
+
+/* ─── Animation #57: Cyber glitch ─── */
+@keyframes cyber-glitch {
+  0%   { clip-path: polygon(0 0, 100% 0, 100% 10%, 0 10%); }
+  20%  { clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%); }
+  40%  { clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%); }
+  60%  { clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%); }
+  80%  { clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); }
+  100% { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
+}
+
+/* ─── Animation #58: Plasma flow ─── */
+@keyframes plasma-flow {
+  0%   { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+  50%  { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+}
+
+/* ─── Animation #59: Hyperspace ─── */
+@keyframes hyperspace {
+  0%   { letter-spacing: -0.5em; opacity: 0; }
+  40%  { opacity: 0.6; }
+  100% { letter-spacing: normal; opacity: 1; }
+}
+
+/* ─── Animation #60: Nebula spin ─── */
+@keyframes nebula-spin {
+  0%   { transform: rotate(0deg) scale(1); filter: hue-rotate(0deg); }
+  50%  { transform: rotate(180deg) scale(1.1); filter: hue-rotate(90deg); }
+  100% { transform: rotate(360deg) scale(1); filter: hue-rotate(180deg); }
+}
+
+/* ─── Animation #61: Synthwave grid ─── */
+@keyframes synthwave-grid {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 40px; }
+}
+
+/* ─── Animation #62: Liquid text ─── */
+@keyframes liquid-text {
+  0%   { transform: skewY(0deg); }
+  25%  { transform: skewY(-5deg); }
+  50%  { transform: skewY(0deg); }
+  75%  { transform: skewY(5deg); }
+  100% { transform: skewY(0deg); }
+}
+
+/* ─── Animation #63: Void collapse ─── */
+@keyframes void-collapse {
+  0%   { transform: scale(1.5); filter: blur(10px) brightness(2); opacity: 0; }
+  100% { transform: scale(1); filter: blur(0) brightness(1); opacity: 1; }
+}
+
+/* ─── Animation #64: Arc reactor ─── */
+@keyframes arc-reactor {
+  0%   { box-shadow: 0 0 10px #5AC8FA, 0 0 20px #5AC8FA; }
+  50%  { box-shadow: 0 0 20px #5AC8FA, 0 0 40px #5AC8FA, 0 0 60px #5AC8FA; }
+  100% { box-shadow: 0 0 10px #5AC8FA, 0 0 20px #5AC8FA; }
+}
+
+/* ─── Animation #65: Magnetic float ─── */
+@keyframes magnetic-float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  25%      { transform: translateY(-5px) rotate(-1deg); }
+  75%      { transform: translateY(5px) rotate(1deg); }
+}
+
+/* ─── Animation #66: Ghost type ─── */
+@keyframes ghost-type {
+  0%   { filter: blur(8px); opacity: 0; }
+  100% { filter: blur(0); opacity: 1; }
+}
+
+/* ─── Animation #67: Data stream ─── */
+@keyframes data-stream {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+
+/* ─── Animation #68: Core pulse ─── */
+@keyframes core-pulse {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 45, 85, 0.7); }
+  70%  { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 45, 85, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 45, 85, 0); }
+}
+
+/* ─── Animation #69: Hologram flicker ─── */
+@keyframes hologram-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; transform: skewX(0); }
+  20% { opacity: 0.5; transform: skewX(10deg); }
+  24% { opacity: 0.8; transform: skewX(-10deg); }
+  55% { opacity: 0.3; transform: skewX(20deg); }
+}
+
+/* ─── Animation #70: Infinity loop ─── */
+@keyframes infinity-loop {
+  0%   { transform: rotate(0deg) translateX(10px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(10px) rotate(-360deg); }
+}
+
+/* ─── Animation #71: Starfield drift ─── */
+@keyframes starfield-drift {
+  0%   { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-100px) translateY(-50px); }
+}
+
+/* ─── Animation #72: Prism split ─── */
+@keyframes prism-split {
+  0%   { text-shadow: 0 0 0 red, 0 0 0 blue; }
+  50%  { text-shadow: -2px 0 0 red, 2px 0 0 blue; }
+  100% { text-shadow: 0 0 0 red, 0 0 0 blue; }
+}
+
+/* ─── Animation #73: Cyberpunk slice ─── */
+@keyframes cyberpunk-slice {
+  0%   { clip-path: inset(0 0 0 0); transform: translateX(0); }
+  10%  { clip-path: inset(40% 0 40% 0); transform: translateX(-5px); }
+  20%  { clip-path: inset(0 0 0 0); transform: translateX(5px); }
+  30%  { clip-path: inset(80% 0 10% 0); transform: translateX(0); }
+  40%  { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+/* ─── Animation #74: Ripple burst ─── */
+@keyframes ripple-burst {
+  0%   { transform: scale(0.5); opacity: 1; border-width: 10px; }
+  100% { transform: scale(2); opacity: 0; border-width: 0px; }
+}
+
+/* ─── Animation #75: Velvet slide ─── */
+@keyframes velvet-slide {
+  0%   { transform: translateY(10px) scale(0.98); opacity: 0; filter: contrast(1.2); }
+  100% { transform: translateY(0) scale(1); opacity: 1; filter: contrast(1); }
+}
+
+/* ─── Animation #76: Quantum jitter ─── */
+@keyframes quantum-jitter {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1px, 1px); }
+  20% { transform: translate(1px, -1px); }
+  30% { transform: translate(-1px, -1px); }
+  40% { transform: translate(1px, 1px); }
+}
+
+/* ─── Animation #77: Lens flare ─── */
+@keyframes lens-flare {
+  0%   { transform: translateX(-150%) skewX(-45deg); opacity: 0; }
+  50%  { opacity: 0.5; }
+  100% { transform: translateX(150%) skewX(-45deg); opacity: 0; }
+}
+
+/* ─── Animation #78: Echo fade ─── */
+@keyframes echo-fade {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ─── Animation #79: Morphing box ─── */
+@keyframes morphing-box {
+  0%   { border-radius: 0%; }
+  25%  { border-radius: 50% 0 0 0; }
+  50%  { border-radius: 50% 50% 0 0; }
+  75%  { border-radius: 50% 50% 50% 0; }
+  100% { border-radius: 50%; }
+}
+
+/* ─── Animation #80: Hyper drive ─── */
+@keyframes hyper-drive {
+  0%   { transform: scale(1) translateZ(0); filter: blur(0); opacity: 1; }
+  100% { transform: scale(3) translateZ(200px); filter: blur(10px); opacity: 0; }
+}
+
+/* ─── Animation #81: Neuro link ─── */
+@keyframes neuro-link {
+  0%   { stroke-dasharray: 0, 100; stroke-dashoffset: 0; }
+  50%  { stroke-dasharray: 100, 0; stroke-dashoffset: 0; }
+  100% { stroke-dasharray: 0, 100; stroke-dashoffset: -100; }
+}
+
+/* ─── Animation #82: Signal wave ─── */
+@keyframes signal-wave {
+  0%   { opacity: 0.2; transform: scale(0.8); }
+  50%  { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.2; transform: scale(0.8); }
+}
+
+/* ─── Animation #83: Dimensional tear ─── */
+@keyframes dimensional-tear {
+  0%   { filter: drop-shadow(0 0 0 #5AC8FA) drop-shadow(0 0 0 #FF2D55); }
+  50%  { filter: drop-shadow(-5px 0 5px #5AC8FA) drop-shadow(5px 0 5px #FF2D55); }
+  100% { filter: drop-shadow(0 0 0 #5AC8FA) drop-shadow(0 0 0 #FF2D55); }
+}
+
+/* ─── Animation #84: Sonic boom ─── */
+@keyframes sonic-boom {
+  0%   { transform: scale(0); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+  100% { transform: scale(3); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+}
+
+/* ─── Animation #85: Float and spin ─── */
+@keyframes float-spin {
+  0%   { transform: translateY(0) rotate(0deg); }
+  50%  { transform: translateY(-15px) rotate(180deg); }
+  100% { transform: translateY(0) rotate(360deg); }
+}
+
+/* ─── Animation #86: Electric arc ─── */
+@keyframes electric-arc {
+  0%   { border-color: #5AC8FA; box-shadow: 0 0 5px #5AC8FA; }
+  33%  { border-color: #FF2D55; box-shadow: 0 0 10px #FF2D55; }
+  66%  { border-color: #34C759; box-shadow: 0 0 15px #34C759; }
+  100% { border-color: #5AC8FA; box-shadow: 0 0 5px #5AC8FA; }
+}
+
+/* ─── Animation #87: Data cascade ─── */
+@keyframes data-cascade {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+/* ─── Animation #88: Kinetic bounce ─── */
+@keyframes kinetic-bounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  20%      { transform: translateY(-20px) scale(0.9, 1.1); }
+  50%      { transform: translateY(0) scale(1.1, 0.9); }
+  80%      { transform: translateY(-10px) scale(0.95, 1.05); }
+}
+
+/* ─── Animation #89: Matrix reveal ─── */
+@keyframes matrix-reveal {
+  0%   { opacity: 0; transform: scale(0.95) matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,20,0,1); }
+  100% { opacity: 1; transform: scale(1) matrix3d(1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1); }
+}
+
+/* ─── Animation #90: Zenith sweep ─── */
+@keyframes zenith-sweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ─── Animation #91: Pulsar ring ─── */
+@keyframes pulsar-ring {
+  0%   { transform: scale(0.8); opacity: 0.5; border-width: 2px; }
+  50%  { transform: scale(1.2); opacity: 1; border-width: 4px; }
+  100% { transform: scale(0.8); opacity: 0.5; border-width: 2px; }
+}
+
+/* ─── Animation #92: Chrono shift ─── */
+@keyframes chrono-shift {
+  0%   { transform: skewX(0deg) scale(1); filter: sepia(0); }
+  50%  { transform: skewX(-20deg) scale(0.9); filter: sepia(0.5); }
+  100% { transform: skewX(0deg) scale(1); filter: sepia(0); }
+}
+
+/* ─── Animation #93: Aurora flow ─── */
+@keyframes aurora-flow {
+  0%   { background-image: linear-gradient(45deg, #FF2D55, #5AC8FA); }
+  50%  { background-image: linear-gradient(135deg, #34C759, #FF9500); }
+  100% { background-image: linear-gradient(45deg, #FF2D55, #5AC8FA); }
+}
+
+/* ─── Animation #94: Seismic tremor ─── */
+@keyframes seismic-tremor {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* ─── Animation #95: Orbital spin ─── */
+@keyframes orbital-spin {
+  0%   { transform: rotateX(0) rotateY(0) rotateZ(0); }
+  100% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+}
+
+/* ─── Animation #96: Solar flare ─── */
+@keyframes solar-flare {
+  0%   { box-shadow: 0 0 10px #FF9500, inset 0 0 10px #FF9500; filter: brightness(1); }
+  50%  { box-shadow: 0 0 30px #FF9500, inset 0 0 20px #FF9500; filter: brightness(1.5); }
+  100% { box-shadow: 0 0 10px #FF9500, inset 0 0 10px #FF9500; filter: brightness(1); }
+}
+
+/* ─── Animation #97: Fluid shift ─── */
+@keyframes fluid-shift {
+  0%   { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  25%  { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+  50%  { border-radius: 30% 70% 70% 30% / 70% 30% 30% 70%; }
+  75%  { border-radius: 70% 30% 30% 70% / 30% 70% 70% 30%; }
+  100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+}
+
+/* ─── Animation #98: Glacial freeze ─── */
+@keyframes glacial-freeze {
+  0%   { filter: saturate(1) blur(0); }
+  50%  { filter: saturate(0) blur(2px) contrast(1.2); }
+  100% { filter: saturate(1) blur(0); }
+}
+
+/* ─── Animation #99: Ember glow ─── */
+@keyframes ember-glow {
+  0%, 100% { background-color: rgba(255, 69, 0, 0.1); box-shadow: 0 0 5px rgba(255, 69, 0, 0.2); }
+  50%      { background-color: rgba(255, 69, 0, 0.3); box-shadow: 0 0 15px rgba(255, 69, 0, 0.6); }
+}
+
+/* ─── Animation #100: Supernova burst ─── */
+@keyframes supernova-burst {
+  0%   { transform: scale(1); filter: brightness(1) hue-rotate(0deg); opacity: 1; }
+  50%  { transform: scale(2); filter: brightness(3) hue-rotate(180deg); opacity: 0.8; }
+  100% { transform: scale(0); filter: brightness(0) hue-rotate(360deg); opacity: 0; }
+}
