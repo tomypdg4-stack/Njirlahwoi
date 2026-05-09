@@ -15,12 +15,14 @@ export interface Message {
   isError?: boolean;
 }
 
+export type Provider = 'openrouter' | 'cloudflare' | 'bailian';
+
 export interface Chat {
   id: string;
   title: string;
   messages: Message[];
   model: string;
-  provider: 'openrouter' | 'cloudflare';
+  provider: Provider;
   createdAt: number;
   updatedAt: number;
   pinned?: boolean;
@@ -34,7 +36,7 @@ interface ChatState {
   isStreaming: boolean;
   streamingContent: string;
   selectedModel: string;
-  selectedProvider: 'openrouter' | 'cloudflare';
+  selectedProvider: Provider;
   temperature: number;
   _hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
@@ -48,7 +50,7 @@ interface ChatState {
   setIsStreaming: (v: boolean) => void;
   setStreamingContent: (v: string) => void;
   setSelectedModel: (model: string) => void;
-  setSelectedProvider: (provider: 'openrouter' | 'cloudflare') => void;
+  setSelectedProvider: (provider: Provider) => void;
   setTemperature: (v: number) => void;
   getActiveChat: () => Chat | null;
   clearMessages: (chatId: string) => void;

@@ -8,6 +8,7 @@ import ChatArea from '@/components/chat/ChatArea';
 import ChatInput from '@/components/chat/ChatInput';
 import { useChatStore } from '@/store/chat-store';
 import { useApiKeyStore } from '@/store/api-key-store';
+import { useAllApiKeysStore } from '@/store/all-api-keys-store';
 
 const ApiKeyModal    = dynamic(() => import('@/components/ui/ApiKeyModal'),    { ssr: false });
 const CommandPalette = dynamic(() => import('@/components/ui/CommandPalette'), { ssr: false });
@@ -27,6 +28,7 @@ export default function ChatPage() {
   } = useChatStore();
 
   const { openrouterKey } = useApiKeyStore();
+  const { bailianApiKey } = useAllApiKeysStore();
 
   useEffect(() => {
     if (_hasHydrated && chats.length === 0) createChat();
@@ -91,6 +93,13 @@ export default function ChatPage() {
           body: JSON.stringify({ messages: msgs, model: selectedModel, stream: true, temperature }),
           signal: abortRef.current.signal,
         });
+      } else if (selectedProvider === 'bailian' && bailianApiKey) {
+        res = await fetch('/api/bailian/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': bailianApiKey },
+          body: JSON.stringify({ messages: msgs, model: selectedModel, stream: true, temperature }),
+          signal: abortRef.current.signal,
+        });
       } else {
         res = await fetch('/api/njiriah/chat', {
           method: 'POST',
@@ -132,7 +141,7 @@ export default function ChatPage() {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [activeChatId, isStreaming, messages, selectedProvider, selectedModel, openrouterKey, temperature, addMessage, updateMessage, setIsStreaming, setStreamingContent]);
+  }, [activeChatId, isStreaming, messages, selectedProvider, selectedModel, openrouterKey, bailianApiKey, temperature, addMessage, updateMessage, setIsStreaming, setStreamingContent]);
 
   const handleStop = useCallback(() => {
     abortRef.current?.abort();

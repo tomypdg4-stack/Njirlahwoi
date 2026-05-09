@@ -1,12 +1,12 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from '@react-spring/web';
 import {
-  ArrowRight, Zap, Shield, Globe, TrendingUp, Code2, Star,
-  ExternalLink, ChevronRight, Key, MessageSquare, Bot
+  ArrowRight, Zap, Shield, Globe, TrendingUp,
+  ExternalLink, ChevronRight, Key, MessageSquare
 } from 'lucide-react';
 import TopNav from '@/components/layout/TopNav';
 import Footer from '@/components/layout/Footer';

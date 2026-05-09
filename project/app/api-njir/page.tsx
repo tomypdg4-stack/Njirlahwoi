@@ -483,50 +483,108 @@ export default function ApiNjirPage() {
             >
               <div className="flex items-center gap-2">
                 <Server size={13} className="text-yellow-400" />
-                <h2 className="text-sm font-bold text-white font-heading">Alibaba Cloud Bailian (DashScope)</h2>
-                <a href="https://bailian.console.aliyun.com/" target="_blank" rel="noopener noreferrer"
+                <h2 className="text-sm font-bold text-white font-heading">Alibaba Cloud — Model Studio (DashScope)</h2>
+                <a href="https://dashscope-intl.aliyuncs.com" target="_blank" rel="noopener noreferrer"
                   className="ml-auto text-[11px] text-white/25 hover:text-yellow-400 flex items-center gap-1 transition-colors">
                   Konsol <ExternalLink size={9} />
                 </a>
               </div>
 
+              {/* Setup guide */}
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="glass-card rounded-2xl p-4 border-yellow-400/10"
+                className="glass-card rounded-2xl p-5 border-yellow-400/10 space-y-4"
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <Shield size={12} className="text-yellow-400" />
-                  <p className="text-xs font-semibold text-yellow-400">Cara mendapatkan API Key</p>
+                <div className="flex items-center gap-2">
+                  <Shield size={13} className="text-yellow-400" />
+                  <p className="text-xs font-semibold text-yellow-400">Setup DashScope International</p>
                 </div>
-                <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-white/35">
-                  <li>Buka <a href="https://bailian.console.aliyun.com/" target="_blank" rel="noopener noreferrer" className="text-yellow-400/70 hover:text-yellow-400 transition-colors">Konsol Bailian</a></li>
-                  <li>Klik avatar → <strong className="text-white/50">API Key Center</strong></li>
-                  <li>Klik <strong className="text-white/50">Buat API Key Baru</strong></li>
-                  <li>Salin dan simpan key (hanya ditampilkan sekali)</li>
-                </ol>
+
+                <div className="space-y-3">
+                  {[
+                    { n: '1', title: 'Buka Model Studio', desc: 'Masuk ke konsol Alibaba Cloud → cari menu Model Studio atau DashScope.' },
+                    { n: '2', title: 'Buat API Key', desc: 'Di menu API Key / Credentials → klik "Create API Key". Format: sk-xxxx.' },
+                    { n: '3', title: 'Catat Model ID', desc: 'Di deployment, klik "Deployment Details" → catat field "Model ID" (contoh: NJIRLAH-1-SS).' },
+                    { n: '4', title: 'Masukkan Key di bawah', desc: 'Tempel API Key ke kolom di bawah, lalu pilih model saat chat.' },
+                  ].map(({ n, title, desc }) => (
+                    <div key={n} className="flex gap-3">
+                      <div className="w-5 h-5 rounded-full bg-yellow-400/15 border border-yellow-400/25 flex items-center justify-center text-yellow-400 text-[10px] font-black flex-shrink-0 mt-0.5">
+                        {n}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-white/70">{title}</p>
+                        <p className="text-[11px] text-white/35 mt-0.5">{desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Endpoint info */}
+                <div className="pt-3 border-t border-white/[0.06]">
+                  <p className="text-[10px] text-white/25 uppercase tracking-wider mb-2">Endpoint (International)</p>
+                  <code className="text-[11px] text-yellow-400/80 bg-yellow-400/5 border border-yellow-400/15 rounded-lg px-3 py-2 block font-mono break-all">
+                    https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+                  </code>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 pt-1">
+                  {[
+                    { label: 'Rate Limit', value: '1200 RPM' },
+                    { label: 'Throughput', value: '9M TPM' },
+                    { label: 'Billing', value: 'Pay-as-go' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="text-center">
+                      <p className="text-sm font-bold text-yellow-400/80 font-heading">{value}</p>
+                      <p className="text-[10px] text-white/25 mt-0.5">{label}</p>
+                    </div>
+                  ))}
+                </div>
               </motion.div>
 
               <ProviderCard
-                name="Alibaba Cloud Bailian"
-                description="Qwen-Turbo, Qwen-Plus, Qwen-Max, Llama-3, DeepSeek-V3/R1, dan ratusan model dari ekosistem Alibaba Cloud."
+                name="Alibaba Cloud Bailian (DashScope)"
+                description="Qwen3, Qwen-Plus, Qwen-Max, DeepSeek-V3/R1, Llama 3.3, dan model custom yang kamu deploy di Alibaba Model Studio."
                 placeholder="sk-..."
-                docsUrl="https://developer.aliyun.com/article/1697678"
+                docsUrl="https://www.alibabacloud.com/help/en/model-studio"
                 value={store.bailianApiKey}
                 status={store.bailianStatus}
                 onSave={store.setBailianKey}
                 onTest={store.testBailianKey}
               />
 
+              {/* Model badges */}
               <div className="glass-card rounded-2xl p-4">
-                <p className="text-[11px] text-yellow-400 font-semibold mb-3">Model tersedia</p>
+                <p className="text-[11px] text-yellow-400 font-semibold mb-3">Model populer di DashScope</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {['qwen-turbo', 'qwen-plus', 'qwen-max', 'qwen-long', 'llama3-8b-instruct', 'llama3-70b-instruct', 'deepseek-v3', 'deepseek-r1'].map((m) => (
+                  {[
+                    'qwen-plus', 'qwen-max', 'qwen-turbo', 'qwen-long',
+                    'qwen3-235b-a22b', 'qwen3-72b', 'qwen3-32b',
+                    'deepseek-v3', 'deepseek-r1',
+                    'llama3.3-70b-instruct',
+                    'NJIRLAH-1-SS',
+                  ].map((m) => (
                     <span key={m} className="px-2 py-0.5 text-[9px] bg-yellow-400/8 border border-yellow-400/15 rounded-lg text-yellow-400/70 font-mono">
                       {m}
                     </span>
                   ))}
+                  <span className="text-[10px] text-white/25 self-center">+ ratusan lainnya</span>
                 </div>
+              </div>
+
+              {/* Error reference */}
+              <div className="glass-card rounded-2xl p-4 space-y-2">
+                <p className="text-[11px] text-white/40 font-semibold mb-1">Referensi error umum</p>
+                {[
+                  { code: '401', msg: 'API Key salah atau expired — periksa format sk-xxxx' },
+                  { code: '404', msg: 'Model ID tidak cocok dengan nama deployment-mu' },
+                  { code: 'Timeout', msg: 'Tambah timeout lebih panjang — coba model yang lebih kecil' },
+                ].map(({ code, msg }) => (
+                  <div key={code} className="flex items-start gap-2">
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-brand-red/10 border border-brand-red/20 text-brand-red/80 flex-shrink-0">{code}</span>
+                    <span className="text-[11px] text-white/30">{msg}</span>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}

@@ -211,12 +211,12 @@ export const useAllApiKeysStore = create<AllApiKeysState>()(
       testBailianKey: async (key: string): Promise<boolean> => {
         set({ bailianStatus: 'testing' });
         try {
-          const res = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'qwen-turbo', input: { messages: [{ role: 'user', content: 'Hi' }] } }),
+          // Use DashScope international OpenAI-compatible endpoint
+          const res = await fetch('https://dashscope-intl.aliyuncs.com/compatible-mode/v1/models', {
+            headers: { Authorization: `Bearer ${key}` },
           });
-          const ok = res.ok || res.status === 400;
+          // 200 = valid, 401 = bad key, other errors may mean auth passed but endpoint issue
+          const ok = res.ok || res.status === 404;
           set({ bailianStatus: ok ? 'valid' : 'invalid' });
           return ok;
         } catch {

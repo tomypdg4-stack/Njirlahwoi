@@ -9,6 +9,7 @@ import TypingIndicator from './TypingIndicator';
 import SkeletonBubble from '@/components/ui/SkeletonBubble';
 import { Message, useChatStore } from '@/store/chat-store';
 import { useApiKeyStore } from '@/store/api-key-store';
+import { useAllApiKeysStore } from '@/store/all-api-keys-store';
 
 /* ── Prompt suggestions (animated stagger) ── */
 const PROMPTS = [
@@ -134,6 +135,7 @@ export default function ChatArea({
 
   const { setLike, activeChatId, selectedProvider } = useChatStore();
   const { hasKey } = useApiKeyStore();
+  const { bailianApiKey } = useAllApiKeysStore();
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
     bottomRef.current?.scrollIntoView({ behavior });
@@ -208,39 +210,38 @@ export default function ChatArea({
           transition={{ delay: 0.6 }}
           className="relative mb-6 z-10"
         >
-          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs ${
-            selectedProvider === 'cloudflare' || hasKey()
-              ? 'bg-brand-green/8 border-brand-green/20 text-brand-green'
-              : 'bg-brand-amber/8 border-brand-amber/20 text-brand-amber'
-          }`}>
-            {/* Multi-state badge dot (animation #33) */}
-            <motion.div
-              className={`relative w-2 h-2`}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.7 }}
-            >
-              <span className={`absolute inset-0 rounded-full ${selectedProvider === 'cloudflare' || hasKey() ? 'bg-brand-green' : 'bg-brand-amber'} animate-ping opacity-50`} />
-              <span className={`relative block w-2 h-2 rounded-full ${selectedProvider === 'cloudflare' || hasKey() ? 'bg-brand-green' : 'bg-brand-amber'}`} />
-            </motion.div>
-            {selectedProvider === 'cloudflare'
+          {(() => {
+            const ready = selectedProvider === 'cloudflare' || hasKey() || (selectedProvider === 'bailian' && !!bailianApiKey);
+            const label = selectedProvider === 'cloudflare'
               ? 'Cloudflare aktif · Langsung mulai!'
+              : selectedProvider === 'bailian' && bailianApiKey
+              ? 'Bailian DashScope tersambung'
               : hasKey()
               ? 'OpenRouter tersambung'
-              : 'Butuh API Key'}
-          </div>
+              : 'Butuh API Key';
+            return (
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs ${ready ? 'bg-brand-green/8 border-brand-green/20 text-brand-green' : 'bg-brand-amber/8 border-brand-amber/20 text-brand-amber'}`}>
+                <motion.div className="relative w-2 h-2" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.7 }}>
+                  <span className={`absolute inset-0 rounded-full ${ready ? 'bg-brand-green' : 'bg-brand-amber'} animate-ping opacity-50`} />
+                  <span className={`relative block w-2 h-2 rounded-full ${ready ? 'bg-brand-green' : 'bg-brand-amber'}`} />
+                </motion.div>
+                {label}
+              </div>
+            );
+          })()}
           {/* Ripple rings */}
-          {[1, 2].map((n) => (
-            <motion.div
-              key={n}
-              className={`absolute inset-0 rounded-full border ${
-                selectedProvider === 'cloudflare' || hasKey() ? 'border-brand-green/20' : 'border-brand-amber/20'
-              }`}
-              initial={{ scale: 1, opacity: 0.4 }}
-              animate={{ scale: 1 + n * 0.5, opacity: 0 }}
-              transition={{ duration: 2, delay: n * 0.5, repeat: Infinity }}
-            />
-          ))}
+          {[1, 2].map((n) => {
+            const ready = selectedProvider === 'cloudflare' || hasKey() || (selectedProvider === 'bailian' && !!bailianApiKey);
+            return (
+              <motion.div
+                key={n}
+                className={`absolute inset-0 rounded-full border ${ready ? 'border-brand-green/20' : 'border-brand-amber/20'}`}
+                initial={{ scale: 1, opacity: 0.4 }}
+                animate={{ scale: 1 + n * 0.5, opacity: 0 }}
+                transition={{ duration: 2, delay: n * 0.5, repeat: Infinity }}
+              />
+            );
+          })}
         </motion.div>
 
         {!hasKey() && selectedProvider === 'openrouter' && (

@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from '@react-spring/web';
-import { ChevronDown, Search, Zap, Key, Cloud, RefreshCw, X, Code2, MessageSquare, Image as ImageIcon } from 'lucide-react';
+import { ChevronDown, Search, Zap, Key, Cloud, RefreshCw, X, Code as Code2, MessageSquare, Image as ImageIcon } from 'lucide-react';
 import { FREE_MODELS, fetchOpenRouterModels, OpenRouterModel } from '@/lib/openrouter';
 import { useApiKeyStore } from '@/store/api-key-store';
-import { useChatStore } from '@/store/chat-store';
+import { useChatStore, Provider } from '@/store/chat-store';
+import { useAllApiKeysStore } from '@/store/all-api-keys-store';
 import ProviderFolder from '@/components/ui/ProviderFolder';
 
 interface CfModel { id: string; name: string; }
@@ -68,7 +69,7 @@ function ModelBadge({ type }: { type?: string }) {
 export default function ModelSelector() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'openrouter' | 'cloudflare'>('cloudflare');
+  const [tab, setTab] = useState<Provider>('cloudflare');
   const [viewMode, setViewMode] = useState<'flat' | 'folders'>('flat');
   const [orModels, setOrModels] = useState<OpenRouterModel[]>([]);
   const [cfModels, setCfModels] = useState<CfModel[]>([]);
@@ -79,6 +80,7 @@ export default function ModelSelector() {
 
   const { openrouterKey, hasKey } = useApiKeyStore();
   const { selectedModel, selectedProvider, setSelectedModel, setSelectedProvider } = useChatStore();
+  const { bailianApiKey } = useAllApiKeysStore();
 
   useEffect(() => {
     const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
@@ -127,11 +129,14 @@ export default function ModelSelector() {
       const found = cfModels.find((m) => m.id === selectedModel);
       return found?.name || selectedModel.split('/').pop()?.replace(/-/g, ' ') || 'CF Model';
     }
+    if (selectedProvider === 'bailian') {
+      return selectedModel;
+    }
     const found = [...FREE_MODELS, ...orModels].find((m) => m.id === selectedModel);
     return found?.name || selectedModel.split('/').pop()?.split(':')[0] || selectedModel;
   };
 
-  const selectModel = (id: string, provider: 'openrouter' | 'cloudflare') => {
+  const selectModel = (id: string, provider: Provider) => {
     setSelectedModel(id);
     setSelectedProvider(provider);
     setOpen(false);
@@ -155,8 +160,9 @@ export default function ModelSelector() {
         {[
           { key: 'cloudflare', label: '☁️ Cloudflare' },
           { key: 'openrouter', label: '🔗 OpenRouter' },
+          { key: 'bailian',    label: '🀄 Bailian' },
         ].map((t) => (
-          <button key={t.key} onClick={() => setTab(t.key as 'openrouter' | 'cloudflare')}
+          <button key={t.key} onClick={() => setTab(t.key as Provider)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs transition-all relative ${tab === t.key ? 'text-brand-blue font-medium' : 'text-white/30 hover:text-white/60'}`}>
             {t.label}
             {tab === t.key && <motion.div layoutId="tab-indicator-ms" className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-blue" />}
@@ -198,6 +204,49 @@ export default function ModelSelector() {
                     <ModelBadge type="chat" />
                   </TiltCard>
                 ))}
+              </div>
+            ) : tab === 'bailian' ? (
+              <div className="p-2 space-y-0.5">
+                {!bailianApiKey ? (
+                  <div className="py-8 text-center px-4">
+                    <span className="text-3xl block mb-3">🀄</span>
+                    <p className="text-sm text-white/60 mb-1">Alibaba Bailian / DashScope</p>
+                    <p className="text-xs text-white/25">Masukkan API Key DashScope di halaman API Keys</p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="px-2 py-1 text-[9px] font-bold text-white/20 uppercase tracking-wider">Qwen Models</p>
+                    {['qwen-plus', 'qwen-max', 'qwen-turbo', 'qwen-long', 'qwen3-235b-a22b', 'qwen3-72b', 'qwen3-32b'].map((id) => (
+                      <TiltCard key={id} selected={selectedModel === id && selectedProvider === 'bailian'} onClick={() => selectModel(id, 'bailian')}>
+                        <div className="min-w-0">
+                          <p className="text-xs text-white/90 truncate">{id}</p>
+                          <p className="text-[10px] text-white/30">Alibaba Cloud · DashScope</p>
+                        </div>
+                        <ModelBadge type="chat" />
+                      </TiltCard>
+                    ))}
+                    <p className="px-2 py-1 text-[9px] font-bold text-white/20 uppercase tracking-wider mt-1">DeepSeek via Bailian</p>
+                    {['deepseek-v3', 'deepseek-r1'].map((id) => (
+                      <TiltCard key={id} selected={selectedModel === id && selectedProvider === 'bailian'} onClick={() => selectModel(id, 'bailian')}>
+                        <div className="min-w-0">
+                          <p className="text-xs text-white/90 truncate">{id}</p>
+                          <p className="text-[10px] text-white/30">DeepSeek · DashScope</p>
+                        </div>
+                        <ModelBadge type="chat" />
+                      </TiltCard>
+                    ))}
+                    <p className="px-2 py-1 text-[9px] font-bold text-white/20 uppercase tracking-wider mt-1">Llama via Bailian</p>
+                    {['llama3.3-70b-instruct', 'llama3.1-405b-instruct'].map((id) => (
+                      <TiltCard key={id} selected={selectedModel === id && selectedProvider === 'bailian'} onClick={() => selectModel(id, 'bailian')}>
+                        <div className="min-w-0">
+                          <p className="text-xs text-white/90 truncate">{id}</p>
+                          <p className="text-[10px] text-white/30">Meta · DashScope</p>
+                        </div>
+                        <ModelBadge type="chat" />
+                      </TiltCard>
+                    ))}
+                  </>
+                )}
               </div>
             ) : !hasKey() ? (
               <div className="py-8 text-center px-4">

@@ -191,7 +191,7 @@ export default function Sidebar({ onOpenApiKey, mobileOpen, onMobileClose }: Sid
 
       {/* ── Nav links ── */}
       <div className="px-2 py-2 border-b border-white/[0.06] flex-shrink-0 space-y-0.5">
-        <NavItem href="/" icon={<MessageSquare size={13} />} label="Chat" collapsed={collapsed} active={pathname === '/'} />
+        <NavItem href="/chat" icon={<MessageSquare size={13} />} label="Chat" collapsed={collapsed} active={pathname === '/chat'} />
         <NavItem href="/models" icon={<LayoutGrid size={13} />} label="Model" collapsed={collapsed} active={pathname === '/models'} />
         <NavItem href="/agent" icon={<Cpu size={13} />} label="Agent" badge="BETA" collapsed={collapsed} active={pathname === '/agent'} />
         <NavItem href="/api-njir" icon={<Zap size={13} />} label="API NJIR" badge="NEW" collapsed={collapsed} active={pathname === '/api-njir'} />
