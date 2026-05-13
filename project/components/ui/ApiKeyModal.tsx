@@ -15,13 +15,13 @@ interface ApiKeyModalProps {
 type Status = 'idle' | 'testing' | 'success' | 'error';
 
 export default function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
-  const [tab, setTab] = useState<'openrouter' | 'cloudflare'>('openrouter');
+  const [tab, setTab] = useState<'openrouter' | 'cloudflare' | 'njirlah'>('njirlah');
   const [showKey, setShowKey] = useState(false);
   const [inputKey, setInputKey] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { setOpenrouterKey, clearKey, openrouterKey, hasKey } = useApiKeyStore();
+  const { setOpenrouterKey, clearKey, openrouterKey, hasKey, njirlahKey, setNjirlahKey, clearNjirlahKey, hasNjirlahKey } = useApiKeyStore();
 
   const testAndSave = async () => {
     if (!inputKey.trim()) return;
@@ -39,11 +39,35 @@ export default function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
     }
   };
 
+  const testAndSaveNjirlah = async () => {
+    if (!inputKey.trim()) return;
+    setStatus('testing');
+    setErrorMsg('');
+    try {
+      // Basic validation format (starts with sk-)
+      if (!inputKey.trim().startsWith('sk-')) throw new Error('Format invalid');
+      await setNjirlahKey(inputKey.trim());
+      setStatus('success');
+      showToast('NJIRLAH API key tersimpan!', 'success');
+      setTimeout(onClose, 800);
+    } catch {
+      setStatus('error');
+      setErrorMsg('API key tidak valid (harus dimulai dengan sk-)');
+    }
+  };
+
   const handleClear = () => {
-    clearKey();
-    setInputKey('');
-    setStatus('idle');
-    showToast('API key dihapus', 'info');
+    if (tab === 'njirlah') {
+      clearNjirlahKey();
+      setInputKey('');
+      setStatus('idle');
+      showToast('NJIRLAH API key dihapus', 'info');
+    } else {
+      clearKey();
+      setInputKey('');
+      setStatus('idle');
+      showToast('API key dihapus', 'info');
+    }
   };
 
   return (
@@ -80,12 +104,13 @@ export default function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
             {/* Tabs */}
             <div className="flex border-b border-white/[0.07]">
               {[
-                { key: 'openrouter', label: 'OpenRouter', icon: <Key size={13} />, badge: 'BYOK', badgeClass: 'bg-brand-blue/10 text-brand-blue/70' },
+                { key: 'njirlah', label: 'NJIRLAH AI', icon: <Key size={13} />, badge: 'Premium', badgeClass: 'bg-brand-blue/10 text-brand-blue/70' },
+                { key: 'openrouter', label: 'OpenRouter', icon: <Key size={13} />, badge: 'BYOK', badgeClass: 'bg-white/10 text-white/70' },
                 { key: 'cloudflare', label: 'Cloudflare', icon: <Cloud size={13} />, badge: 'Free', badgeClass: 'bg-brand-green/10 text-brand-green/70' },
               ].map((t) => (
                 <button
                   key={t.key}
-                  onClick={() => setTab(t.key as 'openrouter' | 'cloudflare')}
+                  onClick={() => { setTab(t.key as 'openrouter' | 'cloudflare' | 'njirlah'); setInputKey(''); setStatus('idle'); setErrorMsg(''); }}
                   className={`flex-1 flex flex-col items-center py-3 text-xs transition-all relative ${
                     tab === t.key ? 'text-brand-blue font-medium' : 'text-white/30 hover:text-white/60'
                   }`}
@@ -146,6 +171,53 @@ export default function ApiKeyModal({ open, onClose }: ApiKeyModalProps) {
                       {status === 'testing' ? 'Testing...' : 'Test & Simpan'}
                     </motion.button>
                     {hasKey() && (
+                      <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleClear}
+                        className="px-4 py-2.5 rounded-xl text-xs text-brand-red border border-brand-red/20 hover:bg-brand-red/10 transition-colors">
+                        Hapus
+                      </motion.button>
+                    )}
+                  </div>
+                </motion.div>
+              ) : tab === 'njirlah' ? (
+                <motion.div key="nj" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} className="p-5 space-y-4">
+                  {hasNjirlahKey() && !inputKey && (
+                    <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-brand-green/8 border border-brand-green/20">
+                      <CheckCircle size={14} className="text-brand-green flex-shrink-0" />
+                      <span className="text-xs text-brand-green">API key aktif dan tersimpan</span>
+                    </motion.div>
+                  )}
+                  <div>
+                    <label className="text-xs text-white/40 mb-1.5 block font-medium">NJIRLAH API Key</label>
+                    <div className="flex items-center gap-2 bg-[#111118] border border-white/[0.07] rounded-xl px-3 py-2.5 focus-within:border-brand-blue/30 transition-colors">
+                      <input
+                        type={showKey ? 'text' : 'password'}
+                        value={inputKey}
+                        onChange={(e) => { setInputKey(e.target.value); setStatus('idle'); }}
+                        placeholder={hasNjirlahKey() ? '••••••••••••• (tersimpan)' : 'sk-...'}
+                        className="flex-1 bg-transparent text-sm text-white/80 placeholder-white/20 outline-none"
+                        onKeyDown={(e) => e.key === 'Enter' && testAndSaveNjirlah()}
+                      />
+                      <button onClick={() => setShowKey(!showKey)} className="text-white/25 hover:text-white/60">
+                        {showKey ? <EyeOff size={13} /> : <Eye size={13} />}
+                      </button>
+                      {status === 'testing' && <Loader size={13} className="text-brand-blue animate-spin" />}
+                      {status === 'success' && <CheckCircle size={13} className="text-brand-green" />}
+                      {status === 'error' && <AlertCircle size={13} className="text-brand-red" />}
+                    </div>
+                    {errorMsg && <p className="text-xs text-brand-red mt-1">{errorMsg}</p>}
+                    {status === 'success' && <p className="text-xs text-brand-green mt-1">✓ Tersambung! Key tersimpan terenkripsi.</p>}
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                      onClick={testAndSaveNjirlah}
+                      disabled={!inputKey.trim() || status === 'testing'}
+                      className="flex-1 py-2.5 rounded-xl text-sm border border-brand-blue/30 text-brand-blue hover:bg-brand-blue/10 transition-colors disabled:opacity-40 font-medium"
+                    >
+                      {status === 'testing' ? 'Testing...' : 'Simpan Key'}
+                    </motion.button>
+                    {hasNjirlahKey() && (
                       <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleClear}
                         className="px-4 py-2.5 rounded-xl text-xs text-brand-red border border-brand-red/20 hover:bg-brand-red/10 transition-colors">
                         Hapus

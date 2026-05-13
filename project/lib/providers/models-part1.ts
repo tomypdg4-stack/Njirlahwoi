@@ -1,5 +1,9 @@
 import { ModelInfo } from './types';
 
+export const NJIRLAH_MODELS: ModelInfo[] = [
+  { id: 'NJIRLAH-1-SS', name: 'NJIRLAH-1-SS', providerId: 'njirlah', context: 32000, inputPrice: 0, outputPrice: 0, capabilities: ['text','code','reasoning'], endpoint: '/api/njirlah/chat', authExample: 'None (Built-in)', isOpenSource: false, license: 'Proprietary', speed: 'fast', isNew: true },
+];
+
 export const ANTHROPIC_MODELS: ModelInfo[] = [
   { id: 'claude-opus-4-5', name: 'Claude Opus 4.5', providerId: 'anthropic', context: 200000, inputPrice: 15, outputPrice: 75, capabilities: ['text','vision','code','reasoning'], endpoint: 'https://api.anthropic.com/v1/messages', authExample: 'x-api-key: sk-ant-xxxxx', isOpenSource: false, license: 'Commercial', speed: 'slow' },
   { id: 'claude-sonnet-4-5', name: 'Claude Sonnet 4.5', providerId: 'anthropic', context: 200000, inputPrice: 3, outputPrice: 15, capabilities: ['text','vision','code'], endpoint: 'https://api.anthropic.com/v1/messages', authExample: 'x-api-key: sk-ant-xxxxx', isOpenSource: false, license: 'Commercial', speed: 'medium' },

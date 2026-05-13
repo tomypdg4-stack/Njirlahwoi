@@ -9,8 +9,10 @@ import { Key, Menu, X, ChevronDown, Zap, Sparkles } from 'lucide-react';
 const NAV_LINKS = [
   { label: 'Models', href: '/models' },
   { label: 'Chat', href: '/chat' },
+  { label: 'LLM Stats', href: '/llm-stats' },
   { label: 'Rankings', href: '/rankings' },
   { label: 'Apps', href: '/apps' },
+  { label: 'MCP Server', href: '/mcp-servers' },
   { label: 'Enterprise', href: '/enterprise' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Docs', href: '/docs' },

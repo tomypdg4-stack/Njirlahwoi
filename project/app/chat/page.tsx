@@ -27,7 +27,7 @@ export default function ChatPage() {
     setIsStreaming, setStreamingContent, setTemperature, getActiveChat, setChatTitle,
   } = useChatStore();
 
-  const { openrouterKey } = useApiKeyStore();
+  const { openrouterKey, njirlahKey } = useApiKeyStore();
   const { bailianApiKey } = useAllApiKeysStore();
 
   useEffect(() => {
@@ -100,6 +100,15 @@ export default function ChatPage() {
           body: JSON.stringify({ messages: msgs, model: selectedModel, stream: true, temperature }),
           signal: abortRef.current.signal,
         });
+      } else if (selectedProvider === 'njirlah') {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (njirlahKey) headers['x-njirlah-key'] = njirlahKey;
+        res = await fetch('/api/njirlah/chat', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ messages: msgs, model: selectedModel, stream: true, temperature }),
+          signal: abortRef.current.signal,
+        });
       } else {
         res = await fetch('/api/njiriah/chat', {
           method: 'POST',
@@ -141,7 +150,7 @@ export default function ChatPage() {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [activeChatId, isStreaming, messages, selectedProvider, selectedModel, openrouterKey, bailianApiKey, temperature, addMessage, updateMessage, setIsStreaming, setStreamingContent]);
+  }, [activeChatId, isStreaming, messages, selectedProvider, selectedModel, openrouterKey, bailianApiKey, njirlahKey, temperature, addMessage, updateMessage, setIsStreaming, setStreamingContent]);
 
   const handleStop = useCallback(() => {
     abortRef.current?.abort();
@@ -179,6 +188,7 @@ export default function ChatPage() {
         <Header
           onOpenCommand={() => setCommandOpen(true)}
           onToggleSidebar={() => setMobileSidebarOpen((v) => !v)}
+          onOpenApiKey={() => setApiKeyOpen(true)}
         />
 
         <ChatArea

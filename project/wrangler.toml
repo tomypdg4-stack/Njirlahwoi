@@ -1,0 +1,13 @@
+name = "njirlah-ai"
+compatibility_date = "2024-05-13"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".vercel/output/static"
+
+[vars]
+# Add your environment variables here
+NEXT_PUBLIC_SUPABASE_URL = ""
+NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
+
+[ai]
+binding = "AI"
+

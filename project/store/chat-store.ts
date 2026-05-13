@@ -15,7 +15,7 @@ export interface Message {
   isError?: boolean;
 }
 
-export type Provider = 'openrouter' | 'cloudflare' | 'bailian';
+export type Provider = 'openrouter' | 'cloudflare' | 'bailian' | 'njirlah';
 
 export interface Chat {
   id: string;

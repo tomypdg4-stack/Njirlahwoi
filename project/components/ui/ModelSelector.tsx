@@ -66,10 +66,14 @@ function ModelBadge({ type }: { type?: string }) {
   return <span className="px-1.5 py-0.5 text-[9px] rounded-md bg-brand-blue/10 text-brand-blue border border-brand-blue/20 flex-shrink-0">CHAT</span>;
 }
 
-export default function ModelSelector() {
+interface ModelSelectorProps {
+  onOpenApiKey?: () => void;
+}
+
+export default function ModelSelector({ onOpenApiKey }: ModelSelectorProps = {}) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<Provider>('cloudflare');
+  const [tab, setTab] = useState<Provider>(selectedProvider);
   const [viewMode, setViewMode] = useState<'flat' | 'folders'>('flat');
   const [orModels, setOrModels] = useState<OpenRouterModel[]>([]);
   const [cfModels, setCfModels] = useState<CfModel[]>([]);
@@ -78,7 +82,7 @@ export default function ModelSelector() {
   const [providerFilter, setProviderFilter] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
-  const { openrouterKey, hasKey } = useApiKeyStore();
+  const { openrouterKey, hasKey, hasNjirlahKey } = useApiKeyStore();
   const { selectedModel, selectedProvider, setSelectedModel, setSelectedProvider } = useChatStore();
   const { bailianApiKey } = useAllApiKeysStore();
 
@@ -132,6 +136,7 @@ export default function ModelSelector() {
     if (selectedProvider === 'bailian') {
       return selectedModel;
     }
+    if (selectedProvider === 'njirlah') return 'NJIRLAH-1-SS';
     const found = [...FREE_MODELS, ...orModels].find((m) => m.id === selectedModel);
     return found?.name || selectedModel.split('/').pop()?.split(':')[0] || selectedModel;
   };
@@ -158,6 +163,7 @@ export default function ModelSelector() {
       {/* Tabs */}
       <div className="flex border-b border-white/[0.07] flex-shrink-0">
         {[
+          { key: 'njirlah', label: '🦄 NJIRLAH AI' },
           { key: 'cloudflare', label: '☁️ Cloudflare' },
           { key: 'openrouter', label: '🔗 OpenRouter' },
           { key: 'bailian',    label: '🀄 Bailian' },
@@ -235,25 +241,41 @@ export default function ModelSelector() {
                         <ModelBadge type="chat" />
                       </TiltCard>
                     ))}
-                    <p className="px-2 py-1 text-[9px] font-bold text-white/20 uppercase tracking-wider mt-1">Llama via Bailian</p>
-                    {['llama3.3-70b-instruct', 'llama3.1-405b-instruct'].map((id) => (
-                      <TiltCard key={id} selected={selectedModel === id && selectedProvider === 'bailian'} onClick={() => selectModel(id, 'bailian')}>
-                        <div className="min-w-0">
-                          <p className="text-xs text-white/90 truncate">{id}</p>
-                          <p className="text-[10px] text-white/30">Meta · DashScope</p>
-                        </div>
-                        <ModelBadge type="chat" />
-                      </TiltCard>
-                    ))}
                   </>
                 )}
               </div>
+            ) : tab === 'njirlah' ? (
+              <div className="p-2 space-y-0.5">
+                <p className="px-2 py-1 text-[9px] font-bold text-white/20 uppercase tracking-wider">NJIRLAH AI (Premium Built-in)</p>
+                {!hasNjirlahKey() && (
+                  <button 
+                    onClick={() => { setOpen(false); onOpenApiKey?.(); }} 
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-brand-amber bg-brand-amber/10 border border-brand-amber/20 rounded-xl mb-2 hover:bg-brand-amber/20 transition-colors text-left"
+                  >
+                    <Key size={12} className="flex-shrink-0" />
+                    <span>Anda belum memasukkan API Key NJIRLAH. Klik di sini.</span>
+                  </button>
+                )}
+                <TiltCard selected={selectedModel === 'NJIRLAH-1-SS' && selectedProvider === 'njirlah'} onClick={() => selectModel('NJIRLAH-1-SS', 'njirlah')}>
+                  <div className="min-w-0">
+                    <p className="text-xs text-white/90 truncate font-semibold gradient-text">NJIRLAH-1-SS Omni</p>
+                    <p className="text-[10px] text-white/40">Architect Class · Reasoning & Code · Ultra Fast</p>
+                  </div>
+                  <ModelBadge type="chat" />
+                </TiltCard>
+              </div>
             ) : !hasKey() ? (
-              <div className="py-8 text-center px-4">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onOpenApiKey?.();
+                }}
+                className="w-full py-8 text-center px-4 hover:bg-white/[0.03] transition-colors rounded-xl"
+              >
                 <Key size={22} className="text-brand-blue mx-auto mb-3" />
                 <p className="text-sm text-white/60 mb-1">OpenRouter BYOK</p>
                 <p className="text-xs text-white/25">Masukkan API key OpenRouter untuk akses 400+ model dari 60+ provider</p>
-              </div>
+              </button>
             ) : loading ? (
               <div className="flex flex-col items-center justify-center py-10 gap-3">
                 <div className="flex gap-1.5">

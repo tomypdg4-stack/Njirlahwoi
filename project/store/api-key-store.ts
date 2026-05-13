@@ -7,11 +7,16 @@ import { encrypt, decrypt } from '@/lib/encryption';
 interface ApiKeyState {
   _encryptedOrKey: string;
   openrouterKey: string | null;
+  _encryptedNjirlahKey: string;
+  njirlahKey: string | null;
   isKeyValid: boolean;
   setKey: (key: string) => Promise<void>;
+  setNjirlahKey: (key: string) => Promise<void>;
   loadKey: () => Promise<void>;
   clearKey: () => void;
+  clearNjirlahKey: () => void;
   hasKey: () => boolean;
+  hasNjirlahKey: () => boolean;
   testConnection: () => Promise<boolean>;
   // Legacy alias kept for UI compatibility
   setOpenrouterKey: (key: string) => Promise<void>;
@@ -23,6 +28,8 @@ export const useApiKeyStore = create<ApiKeyState>()(
     (set, get) => ({
       _encryptedOrKey: '',
       openrouterKey: null,
+      _encryptedNjirlahKey: '',
+      njirlahKey: null,
       isKeyValid: false,
       isValidated: false,
 
@@ -36,21 +43,38 @@ export const useApiKeyStore = create<ApiKeyState>()(
         return get().setKey(key);
       },
 
+      setNjirlahKey: async (key: string) => {
+        const encrypted = await encrypt(key);
+        if (!encrypted) throw new Error('Enkripsi gagal');
+        set({ _encryptedNjirlahKey: encrypted, njirlahKey: key });
+      },
+
       clearKey: () =>
         set({ _encryptedOrKey: '', openrouterKey: null, isKeyValid: false, isValidated: false }),
+        
+      clearNjirlahKey: () =>
+        set({ _encryptedNjirlahKey: '', njirlahKey: null }),
 
       loadKey: async () => {
-        const { _encryptedOrKey } = get();
-        if (!_encryptedOrKey) return;
-        try {
-          const decrypted = await decrypt(_encryptedOrKey);
-          if (decrypted) set({ openrouterKey: decrypted, isKeyValid: true, isValidated: true });
-        } catch {
-          // Silently ignore decrypt errors (e.g. key mismatch after browser fingerprint change)
+        const { _encryptedOrKey, _encryptedNjirlahKey } = get();
+        
+        if (_encryptedOrKey) {
+          try {
+            const decrypted = await decrypt(_encryptedOrKey);
+            if (decrypted) set({ openrouterKey: decrypted, isKeyValid: true, isValidated: true });
+          } catch {}
+        }
+        
+        if (_encryptedNjirlahKey) {
+          try {
+            const decryptedNjirlah = await decrypt(_encryptedNjirlahKey);
+            if (decryptedNjirlah) set({ njirlahKey: decryptedNjirlah });
+          } catch {}
         }
       },
 
       hasKey: () => !!get().openrouterKey,
+      hasNjirlahKey: () => !!get().njirlahKey,
 
       testConnection: async (): Promise<boolean> => {
         const { openrouterKey } = get();
@@ -73,7 +97,7 @@ export const useApiKeyStore = create<ApiKeyState>()(
     }),
     {
       name: 'njirlah-apikey-v2',
-      partialize: (s) => ({ _encryptedOrKey: s._encryptedOrKey }),
+      partialize: (s) => ({ _encryptedOrKey: s._encryptedOrKey, _encryptedNjirlahKey: s._encryptedNjirlahKey }),
     }
   )
 );

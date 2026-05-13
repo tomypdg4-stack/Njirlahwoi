@@ -134,7 +134,7 @@ export default function ChatArea({
   const [showScrollBtn, setShowScrollBtn]   = useState(false);
 
   const { setLike, activeChatId, selectedProvider } = useChatStore();
-  const { hasKey } = useApiKeyStore();
+  const { hasKey, hasNjirlahKey } = useApiKeyStore();
   const { bailianApiKey } = useAllApiKeysStore();
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
@@ -210,38 +210,50 @@ export default function ChatArea({
           transition={{ delay: 0.6 }}
           className="relative mb-6 z-10"
         >
-          {(() => {
-            const ready = selectedProvider === 'cloudflare' || hasKey() || (selectedProvider === 'bailian' && !!bailianApiKey);
-            const label = selectedProvider === 'cloudflare'
+          <button
+            onClick={
+              (selectedProvider === 'openrouter' && !hasKey()) || (selectedProvider === 'njirlah' && !hasNjirlahKey()) || (selectedProvider === 'bailian' && !bailianApiKey)
+                ? onOpenApiKey
+                : undefined
+            }
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-colors ${
+              (selectedProvider === 'cloudflare') || 
+              (selectedProvider === 'openrouter' && hasKey()) || 
+              (selectedProvider === 'njirlah' && hasNjirlahKey()) ||
+              (selectedProvider === 'bailian' && !!bailianApiKey)
+                ? 'bg-brand-green/8 border-brand-green/20 text-brand-green'
+                : 'bg-brand-amber/8 border-brand-amber/20 text-brand-amber cursor-pointer hover:bg-brand-amber/15 hover:border-brand-amber/40'
+            }`}
+          >
+            <motion.div
+              className={`relative w-2 h-2`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              <span className={`absolute inset-0 rounded-full ${(selectedProvider === 'cloudflare') || (selectedProvider === 'openrouter' && hasKey()) || (selectedProvider === 'njirlah' && hasNjirlahKey()) || (selectedProvider === 'bailian' && !!bailianApiKey) ? 'bg-brand-green' : 'bg-brand-amber'} animate-ping opacity-50`} />
+              <span className={`relative block w-2 h-2 rounded-full ${(selectedProvider === 'cloudflare') || (selectedProvider === 'openrouter' && hasKey()) || (selectedProvider === 'njirlah' && hasNjirlahKey()) || (selectedProvider === 'bailian' && !!bailianApiKey) ? 'bg-brand-green' : 'bg-brand-amber'}`} />
+            </motion.div>
+            {selectedProvider === 'cloudflare'
               ? 'Cloudflare aktif · Langsung mulai!'
-              : selectedProvider === 'bailian' && bailianApiKey
-              ? 'Bailian DashScope tersambung'
-              : hasKey()
-              ? 'OpenRouter tersambung'
-              : 'Butuh API Key';
-            return (
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs ${ready ? 'bg-brand-green/8 border-brand-green/20 text-brand-green' : 'bg-brand-amber/8 border-brand-amber/20 text-brand-amber'}`}>
-                <motion.div className="relative w-2 h-2" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.7 }}>
-                  <span className={`absolute inset-0 rounded-full ${ready ? 'bg-brand-green' : 'bg-brand-amber'} animate-ping opacity-50`} />
-                  <span className={`relative block w-2 h-2 rounded-full ${ready ? 'bg-brand-green' : 'bg-brand-amber'}`} />
-                </motion.div>
-                {label}
-              </div>
-            );
-          })()}
+              : selectedProvider === 'njirlah'
+              ? (hasNjirlahKey() ? 'NJIRLAH AI aktif · Premium' : 'Butuh API Key · Klik di sini')
+              : selectedProvider === 'bailian'
+              ? (bailianApiKey ? 'Bailian aktif · DashScope' : 'Butuh API Key · Klik di sini')
+              : (hasKey() ? 'OpenRouter tersambung' : 'Butuh API Key · Klik di sini')}
+          </button>
           {/* Ripple rings */}
-          {[1, 2].map((n) => {
-            const ready = selectedProvider === 'cloudflare' || hasKey() || (selectedProvider === 'bailian' && !!bailianApiKey);
-            return (
-              <motion.div
-                key={n}
-                className={`absolute inset-0 rounded-full border ${ready ? 'border-brand-green/20' : 'border-brand-amber/20'}`}
-                initial={{ scale: 1, opacity: 0.4 }}
-                animate={{ scale: 1 + n * 0.5, opacity: 0 }}
-                transition={{ duration: 2, delay: n * 0.5, repeat: Infinity }}
-              />
-            );
-          })}
+          {[1, 2].map((n) => (
+            <motion.div
+              key={n}
+              className={`absolute inset-0 rounded-full border ${
+                (selectedProvider === 'cloudflare') || (selectedProvider === 'openrouter' && hasKey()) || (selectedProvider === 'njirlah' && hasNjirlahKey()) || (selectedProvider === 'bailian' && !!bailianApiKey) ? 'border-brand-green/20' : 'border-brand-amber/20'
+              }`}
+              initial={{ scale: 1, opacity: 0.4 }}
+              animate={{ scale: 1 + n * 0.5, opacity: 0 }}
+              transition={{ duration: 2, delay: n * 0.5, repeat: Infinity }}
+            />
+          ))}
         </motion.div>
 
         {!hasKey() && selectedProvider === 'openrouter' && (
@@ -256,6 +268,21 @@ export default function ChatArea({
           >
             <Key size={13} />
             Masukkan OpenRouter API Key
+          </motion.button>
+        )}
+
+        {!hasNjirlahKey() && selectedProvider === 'njirlah' && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7 }}
+            onClick={onOpenApiKey}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="mb-6 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-blue/10 border border-brand-blue/25 text-brand-blue text-sm hover:bg-brand-blue/18 transition-all relative z-10"
+          >
+            <Key size={13} />
+            Masukkan NJIRLAH API Key
           </motion.button>
         )}
 

@@ -10,6 +10,7 @@ import { useChatStore } from '@/store/chat-store';
 interface HeaderProps {
   onOpenCommand?: () => void;
   onToggleSidebar?: () => void;
+  onOpenApiKey?: () => void;
 }
 
 function EditableTitle({ chatId, title }: { chatId: string; title: string }) {
@@ -147,7 +148,7 @@ function Logo() {
   );
 }
 
-export default function Header({ onOpenCommand, onToggleSidebar }: HeaderProps) {
+export default function Header({ onOpenCommand, onToggleSidebar, onOpenApiKey }: HeaderProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
 
@@ -230,7 +231,7 @@ export default function Header({ onOpenCommand, onToggleSidebar }: HeaderProps) 
           </>
         )}
 
-        <ModelSelector />
+        <ModelSelector onOpenApiKey={onOpenApiKey} />
         <MultiStateBadge state={badgeState} provider="" />
 
         <motion.button

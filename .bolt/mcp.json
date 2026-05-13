@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "replit": {
+      "enabled": false
+    },
+    "stitch": {
+      "enabled": true
+    },
+    "firecrawl": {
+      "enabled": true
+    }
+  }
+}

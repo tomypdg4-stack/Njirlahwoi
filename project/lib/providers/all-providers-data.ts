@@ -1,6 +1,7 @@
 import { ProviderInfo } from './types';
 
 export const ALL_PROVIDERS: ProviderInfo[] = [
+  { id: 'njirlah', name: 'NJIRLAH AI', color: '#FF0055', baseUrl: 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1', authHeader: 'Authorization: Bearer YOUR_NJIRLAH_KEY', docsUrl: 'https://njirlah.ai/docs', description: 'NJIRLAH-1-SS Omni Framework Architect' },
   { id: 'anthropic', name: 'Anthropic', color: '#D97757', baseUrl: 'https://api.anthropic.com/v1', authHeader: 'x-api-key: YOUR_API_KEY', docsUrl: 'https://docs.anthropic.com', description: 'Claude Opus, Sonnet, Haiku — reasoning & code' },
   { id: 'openai', name: 'OpenAI', color: '#10A37F', baseUrl: 'https://api.openai.com/v1', authHeader: 'Authorization: Bearer YOUR_OPENAI_KEY', docsUrl: 'https://platform.openai.com/docs', description: 'GPT-4o, o1/o3, DALL-E, Whisper' },
   { id: 'google', name: 'Google DeepMind', color: '#4285F4', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', authHeader: '?key=YOUR_GOOGLE_API_KEY', docsUrl: 'https://ai.google.dev/docs', description: 'Gemini 2.5 Pro/Flash, Imagen' },
