@@ -8,7 +8,10 @@
     "start": "next start -p 5000",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "node --loader ts-node/esm server/migrate.ts"
+    "db:migrate": "node --loader ts-node/esm server/migrate.ts",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:preview": "npm run pages:build && wrangler pages dev .vercel/output/static --compatibility-flag nodejs_compat",
+    "pages:deploy": "npm run pages:build && wrangler pages deploy .vercel/output/static"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.0",
@@ -96,8 +99,10 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@types/node": "25.6.2",
-    "@types/react": "18.3.28",
-    "typescript": "6.0.3"
+    "@cloudflare/next-on-pages": "^1.13.16",
+    "@types/node": "20.6.2",
+    "@types/react": "18.2.22",
+    "typescript": "5.2.2",
+    "wrangler": "^4.90.1"
   }
 }
